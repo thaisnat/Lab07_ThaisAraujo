@@ -4,6 +4,7 @@ import java.util.Set;
 
 import excecoes.PrecoInvalidoException;
 import excecoes.StringInvalidaException;
+import excecoes.TipoDeJogoInvalidoException;
 import jogo.Jogabilidade;
 import jogo.Jogo;
 import jogo.Luta;
@@ -12,13 +13,16 @@ import jogo.Rpg;
 
 public class FactoryDeJogo {
 	
-	public void criaJogo(String nome, double preco, String tipo, Set<Jogabilidade> jogabilidades) throws StringInvalidaException, PrecoInvalidoException{
-		if (tipo.equalsIgnoreCase("Rpg")){
-			criaJogoRPG(nome,preco,jogabilidades);	
-		} else if (tipo.equalsIgnoreCase("Luta")){
-			criaJogoLuta(nome,preco,jogabilidades);
-		} else if (tipo.equalsIgnoreCase("Plataforma")){
-			criaJogoPlataforma(nome,preco,jogabilidades);
+	public Jogo criaJogo(String nome, double preco, String tipo, Set<Jogabilidade> jogabilidades) throws TipoDeJogoInvalidoException, StringInvalidaException, PrecoInvalidoException{
+		switch (tipo.toUpperCase()) {
+		case "RPG":
+			return criaJogoRPG(nome,preco,jogabilidades);
+		case "LUTA":
+			return criaJogoLuta(nome,preco,jogabilidades);
+		case "PLATAFORMA":
+			return criaJogoPlataforma(nome,preco,jogabilidades);
+		default:
+			throw new TipoDeJogoInvalidoException("Tipo de jogo invalido");
 		}
 	}
 	

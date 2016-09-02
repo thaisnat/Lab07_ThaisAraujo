@@ -10,6 +10,7 @@ import java.util.Set;
 import easyaccept.EasyAccept;
 import excecoes.PrecoInvalidoException;
 import excecoes.StringInvalidaException;
+import excecoes.TipoDeJogoInvalidoException;
 import excecoes.UpgradeInvalidoException;
 import excecoes.ValorInvalidoException;
 import jogo.Jogabilidade;
@@ -35,17 +36,17 @@ public class LojaController {
 		this.factoryJogo = new FactoryDeJogo();
 	}
 	
-	public void criaUsuario(String nome, String login) throws StringInvalidaException{
+	private void criaUsuario(String nome, String login) throws StringInvalidaException{
 		factoryUsuario.criaUsuario(nome, login);
 	}
 	
-	public void criaJogo(String nome, double preco, String tipo, Set<Jogabilidade> jogabilidades) throws StringInvalidaException, PrecoInvalidoException{
-		factoryJogo.criaJogo(nome, preco, tipo, jogabilidades);
+	private Jogo criaJogo(String nome, double preco, String tipo, Set<Jogabilidade> jogabilidades) throws StringInvalidaException, PrecoInvalidoException, TipoDeJogoInvalidoException{
+		return factoryJogo.criaJogo(nome, preco, tipo, jogabilidades);
 	}
 	
 	public void adicionaUsuario(String nome, String login) {
 		try {
-			Usuario novoUser = new Noob(nome, login);
+			Usuario novoUser = new Usuario(nome, login);
 			meusUsuarios.add(novoUser);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -58,7 +59,7 @@ public class LojaController {
 		try {
 			Usuario buscado = this.buscaUsuario(loginUser);
 			Set<Jogabilidade> tiposJogabilidades = this.createJogabilidades(jogabilidades);
-			Jogo jogoVendido = this.criaJogo(jogoNome, preco, tiposJogabilidades, estiloJogo);
+			Jogo jogoVendido = this.criaJogo(jogoNome, preco, estiloJogo,tiposJogabilidades);
 			buscado.compraJogo(jogoVendido);
 
 		} catch (Exception e) {
@@ -140,21 +141,6 @@ public class LojaController {
 	public int getX2p(String login) {
 		Usuario buscado = this.buscaUsuario(login);
 		return buscado.getXp2();
-	}
-
-	private Jogo criaJogo(String jogoNome, double preco, Set<Jogabilidade> tiposJogabilidades, String estiloJogo)
-			throws StringInvalidaException, PrecoInvalidoException {
-
-		String estilo = estiloJogo.toLowerCase();
-		if (estilo.equals("rpg")) {
-			return new Rpg(jogoNome, preco, tiposJogabilidades);
-		} else if (estilo.equals("plataforma")) {
-			return new Plataforma(jogoNome, preco, tiposJogabilidades);
-		} else if (estilo.equals("luta")) {
-			return new Luta(jogoNome, preco, tiposJogabilidades);
-		} else {
-			return null;
-		}
 	}
 
 	private Set<Jogabilidade> createJogabilidades(String names1) {

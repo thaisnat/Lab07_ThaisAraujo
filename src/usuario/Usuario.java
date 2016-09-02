@@ -5,9 +5,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import excecoes.StringInvalidaException;
+import excecoes.ValorInvalidoException;
 import jogo.Jogo;
 
-public abstract class Usuario {
+public class Usuario {
 
 	public static final String FIM_DE_LINHA = System.lineSeparator();
 
@@ -15,7 +16,8 @@ public abstract class Usuario {
 	private String login;
 	private Set<Jogo> meusJogos;
 	private double credito;
-	private int xp2;
+	private int x2p;
+	private TipoDeUsuario userType;
 
 	public Usuario(String nome, String login) throws StringInvalidaException {
 
@@ -30,16 +32,31 @@ public abstract class Usuario {
 		this.login = login;
 		meusJogos = new HashSet<Jogo>();
 		this.credito = 0;
+		this.userType = new Noob();
 	}
-
-	public abstract void compraJogo(Jogo jogo) throws Exception;
-
+	
+	/**
+	public boolean compraJogo(Jogo jogoRecebido){
+		int preco = (int)jogoRecebido.getPreco();
+		
+		if(dinheiro >= calculaDesconto(jogoRecebido.getPreco())){
+			if (verificaJogo(jogoRecebido)) {
+				return false;
+			} else {
+				this.setDinheiro(this.getDinheiro() - this.calculaDesconto(jogoRecebido.getPreco()));
+				this.setX2p(this.getX2p() + preco * bonificacaoJogo());
+				return listaJogos.add(jogoRecebido);
+			}
+		}
+		return false;
+	}
+	*/
 	public void setXp2(int novoValor) {
 		this.xp2 = novoValor;
 	}
 
-	public int getXp2() {
-		return this.xp2;
+	public int getX2p() {
+		return this.x2p;
 	}
 
 	public void cadastraJogo(Jogo jogo) {
@@ -69,13 +86,25 @@ public abstract class Usuario {
 	public double getCredito() {
 		return this.credito;
 	}
-
+	
+	/**
 	public void registradaJogada(String nomeJogo, int score, boolean venceu) throws Exception {
 		Jogo jogo = this.buscaJogo(nomeJogo);
 		if (jogo == null) {
 			throw new Exception();
 		}
 		setXp2(getXp2() + jogo.registraJogada(score, venceu));
+	}
+	 * @throws Exception 
+	*/
+	
+	public void recompensar(String nomeJogo, int scoreObtido, boolean zerou) throws Exception{
+		Jogo jogo = this.buscaJogo(nomeJogo);
+		if (jogo == null) {
+			throw new Exception();
+		}
+		int pontosDaJogada = jogo.registraJogada(scoreObtido, zerou);
+		this.setXp2(this.getX2p() + pontosDaJogada);	
 	}
 
 	public Jogo buscaJogo(String nomeJogo) {
