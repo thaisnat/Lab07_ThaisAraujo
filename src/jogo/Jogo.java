@@ -2,18 +2,17 @@ package jogo;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import excecoes.PrecoInvalidoException;
 import excecoes.StringInvalidaException;
 
 public abstract class Jogo {
 	public static final String FIM_DE_LINHA = System.lineSeparator();
 
+	// atributos
 	private String nome;
 	private double preco;
-	private int vezesJogadas;
-	private int vezesConcluidas;
-	private int maiorScore;
+	private int maiorScore, quantidadeJogadas, jogadorZerou;
+	private boolean zerou;
 	Set<Jogabilidade> jogabilidades;
 
 	public Jogo(String nome, double preco) throws StringInvalidaException, PrecoInvalidoException {
@@ -27,8 +26,8 @@ public abstract class Jogo {
 
 		this.nome = nome;
 		this.preco = preco;
-		this.vezesConcluidas = 0;
-		this.vezesJogadas = 0;
+		this.jogadorZerou = 0;
+		this.quantidadeJogadas = 0;
 		this.maiorScore = 0;
 		jogabilidades = new HashSet<Jogabilidade>();
 	}
@@ -45,64 +44,151 @@ public abstract class Jogo {
 
 		this.nome = nome;
 		this.preco = preco;
-		this.vezesConcluidas = 0;
-		this.vezesJogadas = 0;
+		this.jogadorZerou = 0;
+		this.quantidadeJogadas = 0;
 		this.maiorScore = 0;
 		this.jogabilidades = jogabilidades;
 	}
 
-	public abstract int registraJogada(int score, boolean venceu);
+	/**
+	 * Metodo que recebe um inteiro que indica a pontuacao atual do jogador
+	 * verifica se o jogador zerou o jogo
+	 * @param score
+	 * @param zerou
+	 * @throws Exception 
+	 */
+	public int registraJogada(int score, boolean zerou) throws Exception{
+		if(score > 0){
+			if (maiorScore < score) {
+				maiorScore = score;	
+			}
+		}else{
+			throw new Exception("Score nao pode ser menor ou igual a zero.");
+		}
+		
+		if (zerou == true){
+			zerou = true;
+			jogadorZerou = jogadorZerou + 1;
+		}
+		
+		this.quantidadeJogadas += 1;
 
-	public double getPreco() {
-		return this.preco;
+		int x2pAtual = pontosExtra();
+		return x2pAtual;
 	}
+	
+	abstract int pontosExtra();
 
+
+	/**
+	 * Metodos Get e Set
+	 * HashCode
+	 * Equals
+	 * toString 
+	 */
+	
+	/**
+	 * Getters
+	 * @return
+	 * @param nome
+	 * @param preco
+	 * @param jogadorZerou
+	 * @param maiorScore
+	 * @param quantidadeJogadas
+	 * @param Jogabilidades
+	 * @param zerou
+	 */
 	public String getNome() {
-		return this.nome;
+		return nome;
 	}
-
+	public double getPreco() {
+		return preco;
+	}
+	public int getJogadorZerou() {
+		return jogadorZerou;
+	}
 	public int getMaiorScore() {
-		return this.maiorScore;
+		return maiorScore;
+	}
+	public int getQuantidadeJogadas() {
+		return quantidadeJogadas;
+	}
+	public Set<Jogabilidade> getJogabilidades() {
+		return jogabilidades;
+	}
+	public boolean getZerou() {
+		return zerou;
+	}
+	
+	/**
+	 * Setters
+	 * @param nome
+	 * @param preco
+	 * @param jogadorZerou
+	 * @param maiorScore
+	 * @param quantidadeJogadas
+	 * @param Jogabilidades
+	 * @param zerou
+	 */
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	public void setPreco(double preco) {
+		this.preco = preco;
+	}
+	public void setJogadorZerou(int jogadorZerou) {
+		this.jogadorZerou = jogadorZerou;
+	}
+	public void setMaiorScore(int maiorScore) {
+		this.maiorScore = maiorScore;
+	}
+	public void setQuantidadeJogadas(int quantidadeJogadas) {
+		this.quantidadeJogadas = quantidadeJogadas;
+	}
+	public void setZerou(boolean zerou) {
+		this.zerou = zerou;
+	}
+	public void setJogabilidades(Set<Jogabilidade> jogabilidades) {
+		this.jogabilidades = jogabilidades;
 	}
 
-	public void setMaiorScore(int novoScore) {
-		this.maiorScore = novoScore;
-	}
-
-	public int getvezesConcluidas() {
-		return this.vezesConcluidas;
-	}
-
-	public void setVezesConcluidas(int novaQuantidade) {
-		this.vezesConcluidas = novaQuantidade;
-	}
-
-	public int getVezesJogadas() {
-		return this.vezesJogadas;
-	}
-
-	public void setVezesJogadas(int novaQuantidade) {
-		this.vezesJogadas = novaQuantidade;
-	}
-
+	/**
+	 * HashCode igual ao Equals
+	 */
 	@Override
-	public String toString() {
-		String resultado = "==> Jogou " + getVezesJogadas() + " vez(es)" + FIM_DE_LINHA;
-		resultado += "==> Zerou " + getvezesConcluidas() + " vez(es)" + FIM_DE_LINHA;
-		resultado += "==> Maior Score: " + getMaiorScore() + FIM_DE_LINHA;
-		return resultado;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(preco);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Jogo) {
-			Jogo temp = (Jogo) obj;
-
-			return this.getNome().equals(temp.getNome()) && this.getPreco() == temp.getPreco();
-
-		} else {
+	/**
+	 * Equals pelo Preco
+	 */
+	public boolean equals(Object obj){
+		if(!(obj instanceof Jogo)){
 			return false;
 		}
-
+		Jogo outro = (Jogo) obj;
+		if(getPreco() == outro.getPreco()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	/**
+	 * toString
+	 */
+	@Override
+	public String toString() {
+		StringBuilder essaString = new StringBuilder();
+		essaString.append("+" + this.nome + "-" + this.getClass().getSimpleName() + ":\n");
+		essaString.append("==> Jogou " + this.getQuantidadeJogadas() + " vez(es)\n");
+		essaString.append("==> Zerou " + this.getJogadorZerou() + " vez(es)\n");
+		essaString.append("==> Maior score " + this.getMaiorScore() + ":\n");
+		return essaString.toString();
 	}
 }

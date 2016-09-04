@@ -16,21 +16,9 @@ public class Luta extends Jogo{
 	}
 	
 	@Override
-	public int registraJogada(int score, boolean venceu) {
-		setVezesJogadas(getVezesJogadas()+ 1);
-		if(score > this.getMaiorScore()){
-			setMaiorScore(score);
-		}
-		if(venceu){
-			setVezesConcluidas(getvezesConcluidas() + 1);
-			
-		}
-		return score/1000;
-	}
-	
-	public String toString() {
-		String resultado = getNome() + " - Luta:" + FIM_DE_LINHA;
-		resultado += super.toString();
-		return resultado;
+	public int pontosExtra() {
+		int valor = 0;
+		valor = valor + (super.getMaiorScore()/1000);
+		return valor;
 	}
 }

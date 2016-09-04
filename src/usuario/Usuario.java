@@ -1,10 +1,8 @@
 package usuario;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import java.util.ArrayList;
 import excecoes.StringInvalidaException;
+import excecoes.TipoDeJogoInvalidoException;
 import excecoes.ValorInvalidoException;
 import jogo.Jogo;
 
@@ -12,138 +10,184 @@ public class Usuario {
 
 	public static final String FIM_DE_LINHA = System.lineSeparator();
 
-	private String nome;
+	private String name;
 	private String login;
-	private Set<Jogo> meusJogos;
-	private double credito;
+	private ArrayList<Jogo> myGames;
+	private double credits;
 	private int x2p;
 	private TipoDeUsuario userType;
+	private Jogo jogo;
 
-	public Usuario(String nome, String login) throws StringInvalidaException {
+	public Usuario(String name, String login) throws StringInvalidaException {
 
-		if (nome == null || nome.trim().isEmpty()) {
+		if (name == null || name.trim().isEmpty()) {
 			throw new StringInvalidaException("Nome nao pode ser nulo ou vazio.");
 		}
 		if (login == null || login.trim().isEmpty()) {
 			throw new StringInvalidaException("Login nao pode ser nulo ou vazio.");
 		}
 
-		this.nome = nome;
+		this.name = name;
 		this.login = login;
-		meusJogos = new HashSet<Jogo>();
-		this.credito = 0;
+		this.myGames = new ArrayList<>();
+		this.credits = 0;
 		this.userType = new Noob();
+		this.jogo = new Jogo();
 	}
 	
 	/**
-	public boolean compraJogo(Jogo jogoRecebido){
-		int preco = (int)jogoRecebido.getPreco();
+	public boolean compraJogo(Jogo gameReceived){
+		int preco = (int)gameReceived.getPreco();
 		
-		if(dinheiro >= calculaDesconto(jogoRecebido.getPreco())){
-			if (verificaJogo(jogoRecebido)) {
+		if(credits >= userType.calculaDesconto(gameReceived.getPreco())){
+			if (verificaJogo(gameReceived)) {
 				return false;
 			} else {
-				this.setDinheiro(this.getDinheiro() - this.calculaDesconto(jogoRecebido.getPreco()));
-				this.setX2p(this.getX2p() + preco * bonificacaoJogo());
-				return listaJogos.add(jogoRecebido);
+				this.setCredits(this.getCredits() - userType.calculaDesconto(gameReceived.getPreco()));
+				this.setX2p(this.getX2p() + preco * userType.bonificacaoJogo());
+				return myGames.add(gameReceived);
 			}
 		}
 		return false;
 	}
 	*/
-	public void setXp2(int novoValor) {
-		this.xp2 = novoValor;
+	
+	/**
+	 * metodo que verifica se o jogo existe
+	 * @param gameReceived
+	 * @return
+	 */
+	private boolean verificaJogo(String gameReceived) {
+		for (Jogo jogo : myGames) {
+			if (myGames.contains(gameReceived)) {
+				return true;
+			}
+		}
+		return false;
 	}
-
-	public int getX2p() {
-		return this.x2p;
+	
+	
+	public int recompensar(String nomeJogo, int scoreObtido, boolean zerou) throws TipoDeJogoInvalidoException{
+		if(verificaJogo(nomeJogo)){
+			int pontosDaJogada = Jogo.registraJogada(scoreObtido, zerou) + userType.valorRecompensar();
+			this.setX2p(this.getX2p() + pontosDaJogada);
+			return this.getX2p();			
+		}else{
+			throw new TipoDeJogoInvalidoException("Jogo nao esta na lista do usuario");
+		}	
 	}
-
-	public void cadastraJogo(Jogo jogo) {
-		this.meusJogos.add(jogo);
-	}
-
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String login) {
-		this.login = login;
-	}
-
-	public void setCredito(double novoValor) {
-		this.credito = novoValor;
-	}
-
-	public double getCredito() {
-		return this.credito;
+	
+	public int punir(String nomeJogo, int scoreObtido, boolean zerou) throws TipoDeJogoInvalidoException{
+		if(verificaJogo(nomeJogo)){
+			int pontosDaJogada = Jogo.registraJogada(scoreObtido, zerou) + userType.valorPunir();
+			this.setX2p(this.getX2p() - pontosDaJogada);
+			return this.getX2p();			
+		}else{
+			throw new TipoDeJogoInvalidoException("Jogo nao esta na lista do usuario");
+		}	
 	}
 	
 	/**
-	public void registradaJogada(String nomeJogo, int score, boolean venceu) throws Exception {
-		Jogo jogo = this.buscaJogo(nomeJogo);
-		if (jogo == null) {
-			throw new Exception();
-		}
-		setXp2(getXp2() + jogo.registraJogada(score, venceu));
-	}
-	 * @throws Exception 
-	*/
-	
-	public void recompensar(String nomeJogo, int scoreObtido, boolean zerou) throws Exception{
-		Jogo jogo = this.buscaJogo(nomeJogo);
-		if (jogo == null) {
-			throw new Exception();
-		}
-		int pontosDaJogada = jogo.registraJogada(scoreObtido, zerou);
-		this.setXp2(this.getX2p() + pontosDaJogada);	
-	}
-
-	public Jogo buscaJogo(String nomeJogo) {
-		Jogo buscado = null;
-		Iterator itr = meusJogos.iterator();
-		while (itr.hasNext()) {
-			Jogo achado = (Jogo) itr.next();
-			if (achado.getNome().equals(nomeJogo)) {
-				buscado = achado;
-			}
-		}
-		return buscado;
-	}
-
-	public Set<Jogo> getMeusJogos() {
-		return meusJogos;
-	}
-
-	public void setMeusJogos(Set<Jogo> meusJogos) {
-		this.meusJogos = meusJogos;
-	}
-
 	public double calculaPrecoTotal() {
 		double total = 0;
-		Iterator itr = meusJogos.iterator();
+		Iterator itr = myGames.iterator();
 		while (itr.hasNext()) {
 			Jogo achado = (Jogo) itr.next();
 			total += achado.getPreco();
 		}
 		return total;
 	}
-
+	 */
+	
+	/**
+	 * Metodos Get e Set
+	 * HashCode
+	 * Equals
+	 * toString 
+	 */
+	
+	/**
+	 * Getters
+	 * @return
+	 */
+	public String getName() {
+		return name;
+	}
+	public String getLogin() {
+		return login;
+	}
+	public ArrayList<Jogo> getMyGames() {
+		return myGames;
+	}
+	public double getCredits() {
+		return credits;
+	}
+	public int getX2p() {
+		return x2p;
+	}
+	public TipoDeUsuario getUserType() {
+		return userType;
+	}
+	/**
+	 * Setters
+	 * @param name
+	 * @param login
+	 * @param myGames
+	 * @param credits
+	 * @param x2p
+	 * @param userType
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setLogin(String login) {
+		this.login = login;
+	}
+	public void setMyGames(ArrayList<Jogo> myGames) {
+		this.myGames = myGames;
+	}
+	public void setCredits(double credits) {
+		this.credits = credits;
+	}
+	public void setX2p(int x2p) {
+		this.x2p = x2p;
+	}
+	public void setUserType(TipoDeUsuario userType) {
+		this.userType = userType;
+	}
+	/**
+	 * HashCode igual ao Equals 
+	 * @return
+	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Usuario) {
-			Usuario temp = (Usuario) obj;
-			return this.getNome().equals(temp.getNome()) && this.getLogin().equals(temp.getLogin());
-		} else {
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		return result;
+	}
+	/**
+	 * Equals pelo Login
+	 * @param obj
+	 * @return
+	 */
+	public boolean equals(Object obj){
+		if(!(obj instanceof Usuario)){
 			return false;
 		}
+		Usuario outro = (Usuario) obj;
+		if(getLogin() == outro.getLogin()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	/**
+	 * toString
+	 */
+	@Override
+	public String toString() {
+		return this.login + "/n" + name + "- Jogador" + this.getClass().getSimpleName() + "\n";
+
 	}
 }

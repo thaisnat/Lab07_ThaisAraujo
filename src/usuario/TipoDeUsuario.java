@@ -1,9 +1,15 @@
 package usuario;
 
-import jogo.Jogo;
+import excecoes.TipoDeJogabilidadeInvalidoException;
+
 
 public interface TipoDeUsuario {
 	
-	public abstract void compraJogo(Jogo jogo) throws Exception;
+	public abstract double calculaDesconto(double preco);
 	
+	public abstract int bonificacaoJogo();
+	
+	public abstract int valorPunir() throws TipoDeJogabilidadeInvalidoException;
+	
+	public int valorRecompensar() throws TipoDeJogabilidadeInvalidoException;
 }

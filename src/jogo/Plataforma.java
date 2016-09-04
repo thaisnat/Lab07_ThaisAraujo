@@ -17,24 +17,10 @@ public class Plataforma extends Jogo {
 	}
 
 	@Override
-	public int registraJogada(int score, boolean venceu) {
-		setVezesJogadas(getVezesJogadas() + 1);
-		if (score > this.getMaiorScore()) {
-			setMaiorScore(score);
-		} else if (score > MAXIMUM_SCORE) {
-			setMaiorScore(MAXIMUM_SCORE);
-		}
-		if (venceu) {
-			setVezesConcluidas(getvezesConcluidas() + 1);
-			return TAXA_XP2;
-		}
-		return 0;
-	}
-
-	public String toString() {
-		String resultado = getNome() + " - Plataforma:" + FIM_DE_LINHA;
-		resultado += super.toString();
-		return resultado;
+	public int pontosExtra() {
+		int valor = 0;
+		valor = valor + (int)(super.getJogadorZerou()*20);
+		return valor;
 	}
 
 }

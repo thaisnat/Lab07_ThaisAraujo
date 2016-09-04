@@ -17,22 +17,10 @@ public class Rpg extends Jogo{
 	}
 
 	@Override
-	public int registraJogada(int score, boolean venceu) {
-		setVezesJogadas(getVezesJogadas()+ 1);
-		if(score > this.getMaiorScore()){
-			setMaiorScore(score);
-		}
-		if(venceu){
-			setVezesConcluidas(getvezesConcluidas() + 1);
-			
-		}
-		return TAXA_XP2;
-	}
-	
-	public String toString() {
-		String resultado = getNome() + " - RPG:" + FIM_DE_LINHA;
-		resultado += super.toString();
-		return resultado;
+	public int pontosExtra(){
+		int valor;
+		valor = (super.getJogadorZerou() * 10);
+		return valor;
 	}
 
 }
