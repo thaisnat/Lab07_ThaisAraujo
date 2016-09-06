@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import excecoes.PrecoInvalidoException;
 import excecoes.StringInvalidaException;
+import excecoes.ValorScoreInvalidoException;
 
 public abstract class Jogo {
 	public static final String FIM_DE_LINHA = System.lineSeparator();
@@ -13,7 +14,7 @@ public abstract class Jogo {
 	private double preco;
 	private int maiorScore, quantidadeJogadas, jogadorZerou;
 	private boolean zerou;
-	Set<Jogabilidade> jogabilidades;
+	static Set<Jogabilidade> jogabilidades;
 
 	public Jogo(String nome, double preco) throws StringInvalidaException, PrecoInvalidoException {
 
@@ -47,7 +48,7 @@ public abstract class Jogo {
 		this.jogadorZerou = 0;
 		this.quantidadeJogadas = 0;
 		this.maiorScore = 0;
-		this.jogabilidades = jogabilidades;
+		Jogo.jogabilidades = jogabilidades;
 	}
 
 	/**
@@ -57,13 +58,13 @@ public abstract class Jogo {
 	 * @param zerou
 	 * @throws Exception 
 	 */
-	public int registraJogada(int score, boolean zerou) throws Exception{
+	public int registraJogada(int score, boolean zerou) throws ValorScoreInvalidoException{
 		if(score > 0){
 			if (maiorScore < score) {
 				maiorScore = score;	
 			}
 		}else{
-			throw new Exception("Score nao pode ser menor ou igual a zero.");
+			throw new ValorScoreInvalidoException("Score nao pode ser menor ou igual a zero.");
 		}
 		
 		if (zerou == true){
@@ -113,7 +114,7 @@ public abstract class Jogo {
 	public int getQuantidadeJogadas() {
 		return quantidadeJogadas;
 	}
-	public Set<Jogabilidade> getJogabilidades() {
+	public static Set<Jogabilidade> getJogabilidades() {
 		return jogabilidades;
 	}
 	public boolean getZerou() {
@@ -149,7 +150,7 @@ public abstract class Jogo {
 		this.zerou = zerou;
 	}
 	public void setJogabilidades(Set<Jogabilidade> jogabilidades) {
-		this.jogabilidades = jogabilidades;
+		Jogo.jogabilidades = jogabilidades;
 	}
 
 	/**

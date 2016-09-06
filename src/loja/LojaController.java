@@ -3,24 +3,19 @@ package loja;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import easyaccept.EasyAccept;
-import excecoes.PrecoInvalidoException;
-import excecoes.StringInvalidaException;
-import excecoes.TipoDeJogoInvalidoException;
-import excecoes.UpgradeInvalidoException;
-import excecoes.ValorInvalidoException;
 import jogo.Jogabilidade;
 import jogo.Jogo;
-import jogo.Luta;
-import jogo.Plataforma;
-import jogo.Rpg;
-import usuario.Noob;
 import usuario.Usuario;
-import usuario.Veterano;
+import easyaccept.EasyAccept;
+import excecoes.PrecoInvalidoException;
+import excecoes.RegistroDeJogadaInvalidoException;
+import excecoes.StringInvalidaException;
+import excecoes.TipoDeJogoInvalidoException;
+import excecoes.TipoDeUsuarioInvalidoException;
+import excecoes.ValorInvalidoException;
 
 public class LojaController {
 	public static final String FIM_DE_LINHA = System.lineSeparator();
@@ -36,20 +31,25 @@ public class LojaController {
 		this.factoryJogo = new FactoryDeJogo();
 	}
 	
-	private void criaUsuario(String nome, String login) throws StringInvalidaException{
-		factoryUsuario.criaUsuario(nome, login);
+	private Usuario criaUsuario(String nome, String login) throws StringInvalidaException{
+		return factoryUsuario.criaUsuario(nome, login);
 	}
 	
 	private Jogo criaJogo(String nome, double preco, String tipo, Set<Jogabilidade> jogabilidades) throws StringInvalidaException, PrecoInvalidoException, TipoDeJogoInvalidoException{
 		return factoryJogo.criaJogo(nome, preco, tipo, jogabilidades);
 	}
 	
-	public void adicionaUsuario(String nome, String login) {
+	public void adicionaUsuario(String nome, String login) throws StringInvalidaException, TipoDeUsuarioInvalidoException {
 		try {
-			Usuario novoUser = new Usuario(nome, login);
-			meusUsuarios.add(novoUser);
+			if(buscaUsuario(login) != null){
+				Usuario novoUser;
+				novoUser = this.criaUsuario(nome, login);
+				meusUsuarios.add(novoUser);
+			}else{
+				throw new TipoDeUsuarioInvalidoException("Usuario nao encontrado");
+			}	
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			throw new TipoDeUsuarioInvalidoException("Usuario invalido");
 		}
 
 	}
@@ -67,29 +67,29 @@ public class LojaController {
 		}
 	}
 
-	public void registraJogada(String login, String nomeJogo, int score, boolean venceu) {
+	public void registraJogada(String login, String nomeJogo, int score, boolean venceu) throws RegistroDeJogadaInvalidoException {
 		try {
-			Usuario usr = this.buscaUsuario(login);
-			usr.registradaJogada(nomeJogo, score, venceu);
+			Usuario user = this.buscaUsuario(login);
+			user.registradaJogada(nomeJogo, score, venceu);
 		} catch (Exception e) {
-			e.getMessage();
+			throw new RegistroDeJogadaInvalidoException("Jogada nao registrada");
 		}
 
 	}
 
-	public void adicionaCredito(String login, double credito) {
+	public void adicionaCredito(String login, double credito) throws ValorInvalidoException {
 		try {
 			if (credito < 0) {
 				throw new ValorInvalidoException("Credito nao pode ser negativo");
 			}
 			Usuario user = this.buscaUsuario(login);
-			user.setCredito(user.getCredito() + credito);
+			user.setCredits(user.getCredits() + credito);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			throw new ValorInvalidoException("Credito nao adicionado");
 		}
 	}
 
-	public Usuario buscaUsuario(String login) {
+	private Usuario buscaUsuario(String login) throws TipoDeUsuarioInvalidoException {
 		Usuario buscado = null;
 
 		try {
@@ -99,31 +99,49 @@ public class LojaController {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			throw new TipoDeUsuarioInvalidoException("Usuario nao encontrado");
 		}
 		return buscado;
 	}
-
-	public void upgrade(String login) throws Exception {
-		Usuario antigo = this.buscaUsuario(login);
-		if (antigo instanceof Veterano) {
-			throw new UpgradeInvalidoException("Upgrade impossivel de ser realizado, usuario ja eh veterano");
-		} else if (antigo.getXp2() < 1000) {
-			throw new UpgradeInvalidoException("Impossivel realizar upgrade, quantidade de x2p insuficiente!");
+	
+	
+	/**
+	 * Verifica se o usuario Noob tem x2p suficiente para se tornar um Veterano
+	 * @param login
+	 * @return
+	 * @throws Exception
+	 */
+	/**
+	public boolean upgradeUsuario(String login) throws Exception{
+		TipoDeUsuario esseUsuario = null;
+		for (Usuario usuario : meusUsuarios) {
+			if(usuario.getLogin().equalsIgnoreCase(login)){
+				esseUsuario = usuario;
+			} 
 		}
-		Usuario novo = new Veterano(antigo.getNome(), antigo.getLogin());
-		novo.setCredito(antigo.getCredito());
-		novo.setXp2(antigo.getXp2());
-		novo.setMeusJogos(antigo.getMeusJogos());
-		int index = meusUsuarios.indexOf(antigo);
-		meusUsuarios.set(index, novo);
-
+		if(esseUsuario != null){
+			if(esseUsuario.getClass() == Noob.class);
+				if (esseUsuario.getX2p() >= 1000){
+					
+					String atribuindoNome = esseUsuario.getName();
+					String atribuindoLogin = esseUsuario.getLogin();
+					double atribuindoDinheiro = esseUsuario.getCredits();
+					
+					esseUsuario = new Veterano();
+					int x2p = esseUsuario.getX2p();
+					esseUsuario.setX2p(x2p);
+					return true;
+				}
+		} else{
+			throw new Exception("Usuario ja eh Veterano");
+		}
+		return false;
 	}
-
-	public double confereCredito(String login) {
+	*/
+	private double confereCredito(String login) {
 		try {
 			Usuario procurado = this.buscaUsuario(login);
-			return procurado.getCredito();
+			return procurado.getCredits();
 		} catch (Exception e) {
 			e.getMessage();
 		}
@@ -138,9 +156,9 @@ public class LojaController {
 		return myString;
 	}
 
-	public int getX2p(String login) {
+	public int getX2p(String login) throws TipoDeUsuarioInvalidoException {
 		Usuario buscado = this.buscaUsuario(login);
-		return buscado.getXp2();
+		return buscado.getX2p();
 	}
 
 	private Set<Jogabilidade> createJogabilidades(String names1) {

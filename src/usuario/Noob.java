@@ -3,7 +3,7 @@ package usuario;
 import java.util.Set;
 import excecoes.TipoDeJogabilidadeInvalidoException;
 import jogo.Jogabilidade;
-
+import jogo.Jogo;
 
 public class Noob implements TipoDeUsuario {
 	public static final double DESCONTO_NOOB = 0.9;
@@ -29,44 +29,34 @@ public class Noob implements TipoDeUsuario {
 		return 10;
 	}
 	
-	private String verificaJogabilidade(Set<Jogabilidade> jogabilidades) throws TipoDeJogabilidadeInvalidoException{
-		for (Jogabilidade jogabilidade : jogabilidades) {
-			if(jogabilidades.equals("Online")){
-				return "Online";
-			} else if(jogabilidades.equals("Competitivo")){
-				return "Competitivo";
-			} else if(jogabilidades.equals("Cooperativo")){
-				return "Cooperativo";
-			} else if(jogabilidades.equals("Offline")){
-				return "Offline";
-			}else if(jogabilidades.equals("Multiplayer")){
-				return "Multiplayer";
-			}
+	public int valorRecompensar() throws TipoDeJogabilidadeInvalidoException {
+		
+		Set<Jogabilidade> listaJ = Jogo.getJogabilidades();
+		
+		for (Jogabilidade jogabilidade : listaJ) {
+			if(jogabilidade == Jogabilidade.OFFLINE){
+				return 30;
+			} else if(jogabilidade == Jogabilidade.MULTIPLAYER){
+				return 10;
+			} 
 		}
 		throw new TipoDeJogabilidadeInvalidoException("Tipo de jogabilidade invalido");
 	}
 	
 	public int valorPunir() throws TipoDeJogabilidadeInvalidoException {
-		Object jogabilidades = null;
-		if(verificaJogabilidade((Set<Jogabilidade>) jogabilidades).equals("Online")){
-			return 10;
-		} else if(verificaJogabilidade((Set<Jogabilidade>) jogabilidades).equals("Competitivo")){
-			return 20;
-		} else if(verificaJogabilidade((Set<Jogabilidade>) jogabilidades).equals("Cooperativo")){
-			return 50;
+		
+		Set<Jogabilidade> listaJ = Jogo.getJogabilidades();
+		
+		for (Jogabilidade jogabilidade : listaJ) {
+			if(jogabilidade == Jogabilidade.ONLINE){
+				return 10;
+			} else if(jogabilidade == Jogabilidade.COMPETITIVO){
+				return 20;
+			} else if(jogabilidade == Jogabilidade.COOPERATIVO){
+				return 50;
 			}
+		}
 		throw new TipoDeJogabilidadeInvalidoException("Tipo de jogabilidade invalido");
 	}
-	
-	public int valorRecompensar() throws TipoDeJogabilidadeInvalidoException {
-		Object jogabilidades = null;
-		if(verificaJogabilidade((Set<Jogabilidade>) jogabilidades).equals("Offline")){
-			return 30;
-		} else if(verificaJogabilidade((Set<Jogabilidade>) jogabilidades).equals("CMultiplayer")){
-			return 10;
-		} 		
-		throw new TipoDeJogabilidadeInvalidoException("Tipo de jogabilidade invalido");
-	}
-			
-	
+
 }

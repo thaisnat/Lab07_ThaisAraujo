@@ -2,11 +2,11 @@
 
 #  Criacao de Usuarios
 
-criaUsuario nome="Despoina" login="despoina.solaris" tipoUsuario="noob"
-criaUsuario nome="Alpanu" login="alpanu.destroctu" tipoUsuario="noob"
-criaUsuario nome="Typhon" login="typhon.moira" tipoUsuario="noob"
-criaUsuario nome="Achlae" login="achlae.sotare" tipoUsuario="noob"
-criaUsuario nome="Aita" login="aita.mortis" tipoUsuario="noob"
+criaUsuario name="Despoina" login="despoina.solaris" tipoUsuario="noob"
+criaUsuario name="Alpanu" login="alpanu.destroctu" tipoUsuario="noob"
+criaUsuario name="Typhon" login="typhon.moira" tipoUsuario="noob"
+criaUsuario name="Achlae" login="achlae.sotare" tipoUsuario="noob"
+criaUsuario name="Aita" login="aita.mortis" tipoUsuario="noob"
 
 # Adiciona Credito
 

@@ -2,8 +2,9 @@ package usuario;
 
 import java.util.ArrayList;
 import excecoes.StringInvalidaException;
+import excecoes.TipoDeJogabilidadeInvalidoException;
 import excecoes.TipoDeJogoInvalidoException;
-import excecoes.ValorInvalidoException;
+import excecoes.ValorScoreInvalidoException;
 import jogo.Jogo;
 
 public class Usuario {
@@ -16,7 +17,6 @@ public class Usuario {
 	private double credits;
 	private int x2p;
 	private TipoDeUsuario userType;
-	private Jogo jogo;
 
 	public Usuario(String name, String login) throws StringInvalidaException {
 
@@ -32,15 +32,13 @@ public class Usuario {
 		this.myGames = new ArrayList<>();
 		this.credits = 0;
 		this.userType = new Noob();
-		this.jogo = new Jogo();
 	}
 	
-	/**
 	public boolean compraJogo(Jogo gameReceived){
 		int preco = (int)gameReceived.getPreco();
 		
 		if(credits >= userType.calculaDesconto(gameReceived.getPreco())){
-			if (verificaJogo(gameReceived)) {
+			if (myGames.contains(gameReceived)) {
 				return false;
 			} else {
 				this.setCredits(this.getCredits() - userType.calculaDesconto(gameReceived.getPreco()));
@@ -50,43 +48,48 @@ public class Usuario {
 		}
 		return false;
 	}
-	*/
 	
 	/**
 	 * metodo que verifica se o jogo existe
 	 * @param gameReceived
 	 * @return
+	 * @throws TipoDeJogoInvalidoException 
 	 */
-	private boolean verificaJogo(String gameReceived) {
+	private Jogo verificaJogo(String gameReceived) throws TipoDeJogoInvalidoException {
 		for (Jogo jogo : myGames) {
 			if (myGames.contains(gameReceived)) {
-				return true;
+				return jogo;
 			}
 		}
-		return false;
+		throw new TipoDeJogoInvalidoException("Jogo nao esta na lista do usuario");
 	}
 	
-	
-	public int recompensar(String nomeJogo, int scoreObtido, boolean zerou) throws TipoDeJogoInvalidoException{
-		if(verificaJogo(nomeJogo)){
-			int pontosDaJogada = Jogo.registraJogada(scoreObtido, zerou) + userType.valorRecompensar();
-			this.setX2p(this.getX2p() + pontosDaJogada);
-			return this.getX2p();			
-		}else{
-			throw new TipoDeJogoInvalidoException("Jogo nao esta na lista do usuario");
-		}	
+	public int recompensar(String nomeJogo, int scoreObtido, boolean zerou) throws TipoDeJogabilidadeInvalidoException, TipoDeJogoInvalidoException, ValorScoreInvalidoException {
+		
+		Jogo jogo = verificaJogo(nomeJogo);
+		int pontosDaJogada = jogo.registraJogada(scoreObtido, zerou) + userType.valorRecompensar();
+		this.setX2p(this.getX2p() + pontosDaJogada);
+		return this.getX2p();			
+		
 	}
 	
-	public int punir(String nomeJogo, int scoreObtido, boolean zerou) throws TipoDeJogoInvalidoException{
-		if(verificaJogo(nomeJogo)){
-			int pontosDaJogada = Jogo.registraJogada(scoreObtido, zerou) + userType.valorPunir();
-			this.setX2p(this.getX2p() - pontosDaJogada);
-			return this.getX2p();			
-		}else{
-			throw new TipoDeJogoInvalidoException("Jogo nao esta na lista do usuario");
-		}	
+	public int punir(String nomeJogo, int scoreObtido, boolean zerou) throws TipoDeJogoInvalidoException, ValorScoreInvalidoException, TipoDeJogabilidadeInvalidoException{
+		
+		Jogo jogo = verificaJogo(nomeJogo);
+		int pontosDaJogada = jogo.registraJogada(scoreObtido, zerou) + userType.valorPunir();
+		this.setX2p(this.getX2p() - pontosDaJogada);
+		return this.getX2p();			
+			
 	}
 	
+	public void registradaJogada(String nomeJogo, int score, boolean venceu) throws Exception {
+		Jogo jogo = this.verificaJogo(nomeJogo);
+		if (jogo == null) {
+			throw new Exception();
+		}
+		setX2p(getX2p() + jogo.registraJogada(score, venceu));
+	}
+
 	/**
 	public double calculaPrecoTotal() {
 		double total = 0;
